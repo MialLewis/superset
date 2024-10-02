@@ -207,7 +207,7 @@ class Chart extends Component {
       return true;
     }
 
-    // `cacheBusterProp` is jected by react-hot-loader
+    // `cacheBusterProp` is injected by react-hot-loader
     return this.props.cacheBusterProp !== nextProps.cacheBusterProp;
   }
 
@@ -528,6 +528,7 @@ class Chart extends Component {
             datasetsStatus={datasetsStatus}
             isInView={isInView}
             emitCrossFilters={emitCrossFilters}
+            canExportData={supersetCanCSV}
           />
         </ChartWrapper>
       </SliceContainer>

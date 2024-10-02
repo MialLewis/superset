@@ -42,6 +42,7 @@ import {
   css,
   getNumberFormatter,
   getExtensionsRegistry,
+  ErrorTypeEnum,
 } from '@superset-ui/core';
 import ErrorMessageWithStackTrace from 'src/components/ErrorMessage/ErrorMessageWithStackTrace';
 import {
@@ -225,8 +226,8 @@ const ResultSet = ({
     reRunQueryIfSessionTimeoutErrorOnMount();
   }, [reRunQueryIfSessionTimeoutErrorOnMount]);
 
-  const fetchResults = (q: typeof query) => {
-    dispatch(fetchQueryResults(q, displayLimit));
+  const fetchResults = (q: typeof query, timeout?: number) => {
+    dispatch(fetchQueryResults(q, displayLimit, timeout));
   };
 
   const prevQuery = usePrevious(query);
@@ -262,6 +263,8 @@ const ResultSet = ({
   const changeSearch = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
   };
+
+  const canExportData = findPermission('can_export_csv', 'SQLLab', user?.roles);
 
   const createExploreResultsOnClick = async (clickEvent: MouseEvent) => {
     const { results } = query;
@@ -309,13 +312,6 @@ const ResultSet = ({
         templateParams: query?.templateParams,
         schema: query?.schema,
       };
-
-      const canExportData = findPermission(
-        'can_export_csv',
-        'SQLLab',
-        user?.roles,
-      );
-
       return (
         <ResultSetControls>
           <SaveDatasetModal
@@ -549,7 +545,18 @@ const ResultSet = ({
           link={query.link}
           source="sqllab"
         />
-        {trackingUrl}
+        {(query?.extra?.errors?.[0] || query?.errors?.[0])?.error_type ===
+        ErrorTypeEnum.FRONTEND_TIMEOUT_ERROR ? (
+          <Button
+            className="sql-result-track-job"
+            buttonSize="small"
+            onClick={() => fetchResults(query, 0)}
+          >
+            {t('Retry fetching results')}
+          </Button>
+        ) : (
+          trackingUrl
+        )}
       </ResultlessStyles>
     );
   }
@@ -668,6 +675,7 @@ const ResultSet = ({
             filterText={searchText}
             expandedColumns={expandedColumns}
             allowHTML={allowHTML}
+            disableTextSelection={canExportData}
           />
         </ResultContainer>
       );

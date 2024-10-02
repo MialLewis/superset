@@ -17,6 +17,7 @@
  * under the License.
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import Split from 'react-split';
 import {
@@ -47,6 +48,7 @@ import { DataTablesPane } from '../DataTablesPane';
 import { ChartPills } from '../ChartPills';
 import { ExploreAlert } from '../ExploreAlert';
 import useResizeDetectorByObserver from './useResizeDetectorByObserver';
+import { findPermission } from 'src/utils/findPermission';
 
 const propTypes = {
   actions: PropTypes.object.isRequired,
@@ -71,6 +73,7 @@ const propTypes = {
   chart: chartPropShape,
   errorMessage: PropTypes.node,
   triggerRender: PropTypes.bool,
+  canExportData: PropTypes.bool,
 };
 
 const GUTTER_SIZE_FACTOR = 1.25;
@@ -237,6 +240,10 @@ const ExploreChartPanel = ({
     setShowSplit(isOpen);
   }, []);
 
+  const canExportData = useSelector(state =>
+    findPermission('can_csv', 'Superset', state.user?.roles),
+  );
+
   const renderChart = useCallback(
     () => (
       <div
@@ -270,6 +277,7 @@ const ExploreChartPanel = ({
             timeout={timeout}
             triggerQuery={chart.triggerQuery}
             vizType={vizType}
+            canExportData={canExportData}
           />
         )}
       </div>

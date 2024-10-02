@@ -151,6 +151,7 @@ export default function transformProps(
     areaB,
     annotationLayers,
     colorScheme,
+    timeShiftColor,
     contributionMode,
     legendOrientation,
     legendType,
@@ -406,6 +407,7 @@ export default function transformProps(
         showValueIndexes: showValueIndexesA,
         totalStackedValues,
         thresholdValues,
+        timeShiftColor,
       },
     );
     if (transformedSeries) series.push(transformedSeries);
@@ -455,6 +457,7 @@ export default function transformProps(
         showValueIndexes: showValueIndexesB,
         totalStackedValues: totalStackedValuesB,
         thresholdValues: thresholdValuesB,
+        timeShiftColor,
       },
     );
     if (transformedSeries) series.push(transformedSeries);
@@ -590,6 +593,7 @@ export default function transformProps(
           extractForecastValuesFromTooltipParams(forecastValue);
 
         const keys = Object.keys(forecastValues);
+        let focusedRow;
         keys.forEach(key => {
           const value = forecastValues[key];
           // if there are no dimensions, key is a verbose name of a metric,
@@ -624,12 +628,11 @@ export default function transformProps(
               : tooltipFormatterSecondary,
           });
           rows.push(row);
+          if (key === focusedSeries) {
+            focusedRow = rows.length - 1;
+          }
         });
-        return tooltipHtml(
-          rows,
-          tooltipFormatter(xValue),
-          keys.findIndex(key => key === focusedSeries),
-        );
+        return tooltipHtml(rows, tooltipFormatter(xValue), focusedRow);
       },
     },
     legend: {

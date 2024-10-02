@@ -154,6 +154,7 @@ export default function PivotTableChart(props: PivotTableProps) {
     dateFormatters,
     onContextMenu,
     timeGrainSqla,
+    dataSelectionMode,
     allowRenderHtml,
   } = props;
 
@@ -556,6 +557,7 @@ export default function PivotTableChart(props: PivotTableProps) {
           subtotalOptions={subtotalOptions}
           namesMapping={verboseMap}
           onContextMenu={handleContextMenu}
+          dataSelectionMode={dataSelectionMode}
           allowRenderHtml={allowRenderHtml}
         />
       </PivotTableWrapper>
